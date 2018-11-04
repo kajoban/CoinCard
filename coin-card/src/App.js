@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import logo from './logo.svg';
 import './App.css';
 
 const request = require('request');
@@ -21,8 +20,8 @@ class App extends Component {
   render() {
     return (
       <div>
-        <SearchBox fetchCoin={this.fetchCoin.bind(this)}/>
-        <Card data={this.state}/>
+        <SearchBox fetchCoin={this.fetchCoin.bind(this)} />
+        <Card data={this.state} />
       </div>
     )
   }
@@ -31,15 +30,27 @@ class App extends Component {
 
     console.log(url)
 
-    fetch(url).then((res) => res.json()).then((data) => {
-      
-      this.setState({
-        base: data.asset_id_base,
-        quote: data.asset_id_quote,
-        rate: data.rate,
-        notFound: data.error
-      })
-    }).catch((err) => console.log('oh snap!'))
+    request(url, (error, response, body) => {
+      let data = JSON.parse(body);
+      console.log(response.statusCode)
+      console.log(url)
+      if (response.statusCode === 200) {
+        console.log(data);
+        this.setState({
+          base: data.asset_id_base,
+          quote: data.asset_id_quote,
+          rate: data.rate,
+          notFound: data.error
+        })
+      } else {
+        console.log('error....')
+        this.setState({
+          notFound: data.error
+        })
+      }
+
+    })
+
   }
 
   fetchCoin(coin) {
@@ -58,20 +69,20 @@ class SearchBox extends Component {
   render() {
     return (
       <form
-        className="searchbox"
+        className='searchbox'
         onSubmit={this.handleClick.bind(this)}>
 
         <input
-          ref="search"
-          className="searchbox_input"
-          type="text"
-          placeholder="type coin...">
+          ref='search'
+          className='searchbox_input'
+          type='text'
+          placeholder='type coin...'>
         </input>
 
         <input
-          type="submit"
-          className="searchbox_button"
-          value="Search Coin">
+          type='submit'
+          className='searchbox_button'
+          value='Search Coin'>
         </input>
 
       </form>
@@ -83,7 +94,7 @@ class SearchBox extends Component {
     let coin = this.refs.search.value
     coin = coin.toUpperCase()
     this.props.fetchCoin(coin)
-    this.refs.search.value = " "
+    this.refs.search.value = ''
   }
 }
 
@@ -91,9 +102,9 @@ class Card extends Component {
   render() {
     let data = this.props.data
 
-    if (data.error) {
+    if (data.notFound) {
       return (
-        <h3>Coin not found</h3>
+        <h3>{data.notFound}</h3>
       )
     } else {
       return (
