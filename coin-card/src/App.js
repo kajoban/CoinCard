@@ -1,15 +1,16 @@
 import React, { Component } from 'react';
 import './App.css';
 
+//for api requests to coin data 
 const request = require('request');
-
 const apikey = 'AC48C219-0223-4FB0-A290-F67F34F02A07'
 
+//main app component
 class App extends Component {
   constructor(props) {
     super(props);
 
-    this.state = {
+    this.state = { //state is made up of these 4 properties 
       base: 'BTC',
       quote: 'USD',
       rate: '',
@@ -17,16 +18,19 @@ class App extends Component {
     }
   }
 
-  render() {
+  render() { //app comonent made of search box (for api requests) and card (for displaying data)
     return (
       <div>
-        <SearchBox fetchCoin={this.fetchCoin.bind(this)} />
+        <Title/>
+        <SearchBox fetchCoin={this.fetchCoin.bind(this)} /> 
         <Card data={this.state} />
+        <Footer/>
       </div>
     )
-  }
+  } //api request is a prop of search box 
+  //app state is a prop of data card 
 
-  fetchApi(url) {
+  fetchApi(url) { //function for api requests 
 
     console.log(url)
 
@@ -39,7 +43,7 @@ class App extends Component {
         this.setState({
           base: data.asset_id_base,
           quote: data.asset_id_quote,
-          rate: data.rate,
+          rate: parseFloat(data.rate).toFixed(5),
           notFound: data.error
         })
       } else {
@@ -53,18 +57,19 @@ class App extends Component {
 
   }
 
-  fetchCoin(coin) {
+  fetchCoin(coin) { //request on button submit 
     let url = `https://rest.coinapi.io/v1/exchangerate/${coin}/USD?apikey=${apikey}`
     this.fetchApi(url)
   }
 
-  componentDidMount() {
+  componentDidMount() { //automatic request on load in
     let url = `https://rest.coinapi.io/v1/exchangerate/${this.state.base}/USD?apikey=${apikey}`
     this.fetchApi(url)
   }
 
 }
 
+//search box component 
 class SearchBox extends Component {
   render() {
     return (
@@ -75,13 +80,30 @@ class SearchBox extends Component {
         <input
           ref='search'
           className='searchbox_input'
+          id='searchtext'
           type='text'
-          placeholder='type coin...'>
+          placeholder='Enter coin...'
+          list='coins'>
         </input>
-
+        <datalist id='coins'>
+            <option value='BTC'/>
+            <option value='BCH'/>
+            <option value='ETH'/>
+            <option value='ZEC'/>
+            <option value='XMR'/>
+            <option value='LTC'/>
+            <option value='WTC'/>
+            <option value='ETC'/>
+            <option value='XRP'/>
+            <option value='NEO'/>
+            <option value='DOGE'/>
+        </datalist>
+        <br/>
         <input
           type='submit'
           className='searchbox_button'
+          class='btn btn-outline-success'
+          id='gobtn'
           value='Search Coin'>
         </input>
 
@@ -91,35 +113,47 @@ class SearchBox extends Component {
 
   handleClick(e) {
     e.preventDefault()
-    let coin = this.refs.search.value
-    coin = coin.toUpperCase()
-    this.props.fetchCoin(coin)
-    this.refs.search.value = ''
+    let coin = this.refs.search.value //get input from search box on click
+    coin = coin.toUpperCase() //cleanse input 
+    this.props.fetchCoin(coin) //on click, make an api request 
+    this.refs.search.value = '' //reset value in search box to blank
   }
 }
 
 class Card extends Component {
   render() {
-    let data = this.props.data
+    let data = this.props.data //get data
 
-    if (data.notFound) {
+    if (data.notFound) { //handle error 
       return (
-        <h3>{data.notFound}</h3>
+        <h3 id='datatitle'>{data.notFound}</h3> 
       )
-    } else {
+    } else { //display infromation 
       return (
         <div>
-          <h2>Base</h2>
-          {data.base}
-          <h2>Quote</h2>
-          {data.quote}
-          <h1>Rate</h1>
-          {data.rate}
+          <h2 id='datatitle'>Rate:</h2>
+          <p id='datatext'>$1 {data.quote} = ${data.rate} {data.base}</p>
         </div>
       )
     }
 
 
+  }
+}
+
+class Title extends Component{
+  render(){
+    return(
+      <h1 id='titletext'>Coin Card <span role='img'>📈</span></h1>
+    )
+  }
+}
+
+class Footer extends Component{
+  render(){
+    return(
+      <p id='footertext'>Built by Kajoban with <span role='img'>⚛️ + ❤️</span></p>
+    )
   }
 }
 
