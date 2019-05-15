@@ -8,7 +8,7 @@ import Footer from './Footer';
 
 //for api requests to coin data 
 const request = require('request');
-const apikey = 'AC48C219-0223-4FB0-A290-F67F34F02A07'
+const apikey = '707C88E4-84EE-4E2F-A7F7-8D1F92DDBE3A'
 
 //main app component
 class App extends Component {
@@ -23,7 +23,7 @@ class App extends Component {
     }
   }
 
-  render() { //app comonent made of search box (for api requests) and card (for displaying data)
+  render() { //app component made of search box (for api requests) and card (for displaying data)
     return (
       <div>
         <Title/>
